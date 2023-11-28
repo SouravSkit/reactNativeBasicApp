@@ -14,7 +14,7 @@ export default function FooterComponent() {
           color: 'black',
           textAlign: 'center',
         }}>
-        All rights reserved by Wholewave Elements,2021
+        All rights reserved by React Animations ,2023
       </Text>
     </View>
   );

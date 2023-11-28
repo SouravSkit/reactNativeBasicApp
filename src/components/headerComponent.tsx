@@ -6,7 +6,7 @@ export default function HeaderComponent() {
     <View style={headerStyles.container}>
       <Text style={headerStyles.headerText}>
 	  Welcome to
-        <Text style={headerStyles.innerText}> Wholewave Elements Pvt Ltd</Text>
+        <Text style={headerStyles.innerText}> My react animated Project</Text>
       </Text>
     </View>
   );
