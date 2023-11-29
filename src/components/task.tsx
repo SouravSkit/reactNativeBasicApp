@@ -1,107 +1,57 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Modal,TextInput,Alert } from 'react-native';
-import axios from 'axios';
+import { View, Text, FlatList, Image, StyleSheet, TouchableOpacity, Modal,TextInput,Alert, Dimensions } from 'react-native';
+import Swiper from 'react-native-deck-swiper';
+
+const data = [
+  { id: 1, text: 'Item 1', imageSource: require('../assets/tech2.jpg') },
+  { id: 2, text: 'Item 2', imageSource: require('../assets/image11.jpg') },
+  { id: 3, text: 'Item 3', imageSource: require('../assets/image22.jpg') },
+  { id: 4, text: 'Item 4', imageSource: require('../assets/image33.jpg') },
+  { id: 6, text: 'Item 6', imageSource: require('../assets/image44.jpg') },
+  { id: 7, text: 'Item 7', imageSource: require('../assets/image55.jpg') },
+  { id: 8, text: 'Item 8', imageSource: require('../assets/image66.jpg') },
+{ id: 9, text: 'Item 9', imageSource: require('../assets/image77.jpg') },
+  { id:10, text: 'Item 10', imageSource: require('../assets/image88.jpg') },
+  { id:11, text: 'Item 11', imageSource: require('../assets/image99.jpg') },
+  { id: 12, text: 'Item 12', imageSource: require('../assets/images 1010.jpg') },
+  { id: 13, text: 'Item 13', imageSource: require('../assets/image1111.jpg') },
+  { id: 14, text: 'Item 14', imageSource: require('../assets/tech3.jpg') },
+  { id: 16, text: 'Item 16', imageSource: require('../assets/image44.jpg') },
+
+];
 
 const Task = () => {
-  const apiUrl = 'https://picsum.photos/v2/list';
-  const [data, setData] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [searchId, setSearchId] = useState('');
 
+  
 
-  useEffect(() => {
-    axios.get(apiUrl)
-      .then(response => {
-        setData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
+  const[index,setIndex]= useState(0);
+  const onSwiped =()=>{
+    setIndex(index+1)
+  }
 
-  const handleInfoPress = (id:any) => {
-    const infoUrl = `https://picsum.photos/id/${id}/info`;
-    axios.get(infoUrl)
-      .then(response => {
-        setSelectedImage(response.data);
-        console.log('response===>',JSON.stringify(response))
-        setModalVisible(true);
-      })
-      .catch(error => {
-        console.error('Error fetching image information:', error);
-      });
-  };
-
-  const handleSearch = () => {
-    const filteredImage = data.find(item => item.id.toString() === searchId);    
-    if (filteredImage) {
-      console.log('filtered image data==>', filteredImage.download_url)
-      handleInfoPress(filteredImage.id);
-    } else {
-      Alert.alert('Image not found. Please enter a valid image ID.');
-    }
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
-      <Image source={{ uri: item.download_url }} style={styles.image} />
-      <TouchableOpacity
-        style={styles.infoButton}
-        onPress={() => handleInfoPress(item.id)}
-      >
-        <Text style={styles.infoButtonText}>INFO</Text>
-      </TouchableOpacity>
-      <Text style={styles.author}>{item.author}</Text>
+  const Card = ({card})=>(
+    <View style={styles.card}>
+      <Image source = {card.imageSource} style={styles.cardImage}/>
     </View>
-  );
+  )
 
   return (
     <View style={styles.container}>
-
-<TextInput
-        style={styles.input}
-        placeholder="Enter Image ID"
-        onChangeText={(text) => setSearchId(text)}
-        value={searchId}
+<View>
+      <Swiper cards={data}
+      cardIndex={index}
+      renderCard={(card)=><Card card={card}
+      />}
+      onSwiper={onSwiped}
+      stackSize={4}
+      stackScale={10}
+      stackSeparation={14}
+      infinite
+      disableTopSwipe
+      disableBottomSwipe
       />
-      <TouchableOpacity
-        style={styles.searchButton}
-        onPress={handleSearch}
-      >
-        <Text style={styles.searchButtonText}>Search</Text>
-      </TouchableOpacity>
+      </View>
 
-      <FlatList
-        data={data}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-      />
-      
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-        <Text style={styles.modalText}>{selectedImage?.id}</Text>
-          <Text style={styles.modalText}>{selectedImage?.author}</Text>
-          <Text style={styles.modalText}>{selectedImage?.width} x {selectedImage?.height}</Text>
-          {/* <Text style={styles.modalText}>{selectedImage?.url}</Text> */}
-          {selectedImage && (
-      <Image source={{ uri: selectedImage.download_url }} style={styles.image} />
-    )}
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setModalVisible(false)}
-          >
-            <Text style={styles.closeButtonText}>Close</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -111,70 +61,118 @@ const styles = StyleSheet.create({
     flex:1,
      backgroundColor:'#87CEEB'
   },
-  itemContainer: {
-    margin: 10,
-    alignItems: 'center',
-  },
-  image: {
-    width: 150,
-    height: 150,
+  
+card: {
+  width: Dimensions.get('window').width - 130,
+
+    flex: 0.3,
     borderRadius: 8,
-  },
-  infoButton: {
-    marginTop: 25,
-    padding: 10,
-    backgroundColor: 'blue',
-    borderRadius: 5,
-  },
-  infoButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  author: {
-    marginTop: 5,
-    fontSize: 16,
-  },
-  modalContainer: {
-    flex: 1,
+    borderColor: '#E8E8E8',
     justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor:'#6B72FE'
+    backgroundColor: 'white',
+    alignSelf:'center'
   },
-  modalText: {
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  closeButton: {
-    marginTop:25,
-    backgroundColor: 'blue',
-    padding: 10,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    margin: 10,
-    padding: 10,
-    borderRadius: 5,
-  },
-  searchButton: {
-    backgroundColor: 'blue',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    margin: 10,
-  },
-  searchButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
+  cardImage:{
+  //   width:160,
+  //   flex:1,
+  //   resizeMode:'contain',
+  //  alignSelf:'center'
+
+  width: Dimensions.get('window').width - 130,
+  height: Dimensions.get('window').height - 600,
+  borderRadius: 8,
+  resizeMode: 'cover',
+  }
 
 });
 
 export default Task;
+
+
+
+// import React from 'react';
+// import { View, Text, Image, StyleSheet, Dimensions,ScrollView } from 'react-native';
+// import Animated, { interpolate,useSharedValue } from 'react-native-reanimated';
+
+// const Width = Dimensions.get('window').width;
+// const Height = Dimensions.get('window').height;
+// const Card = ({ item, index, offsetX }) => {
+//   console.log('item,index,offset',item, index, offsetX);
+  
+//   const cardStyle = {
+//     transform: [
+//       {
+//         rotate: interpolate(offsetX, {
+//           inputRange: [
+//             (index - 1) * Width,
+//             index * Width,
+//             (index + 1) * Height,
+//           ],
+//           outputRange: ['-10deg', '0deg', '10deg'],
+//           extrapolate: 'clamp',
+//         }),
+//       },
+//     ],
+//   };
+
+//   return (
+//     <Animated.View style={[styles.card, cardStyle]}>
+//       <Image source={item.imageSource} style={styles.cardImage} />
+//       <Text>{item.text}</Text>
+//     </Animated.View>
+//   );
+// };
+
+// const YourComponent = () => {
+//   const data = [
+//   { id: 1, text: 'Item 1', imageSource: require('../assets/tech2.jpg') },
+//   { id: 2, text: 'Item 2', imageSource: require('../assets/image11.jpg') },
+//   { id: 3, text: 'Item 3', imageSource: require('../assets/image22.jpg') },
+//   { id: 4, text: 'Item 4', imageSource: require('../assets/image33.jpg') },
+//   { id: 6, text: 'Item 6', imageSource: require('../assets/image44.jpg') },
+//   { id: 7, text: 'Item 7', imageSource: require('../assets/image55.jpg') },
+//   { id: 8, text: 'Item 8', imageSource: require('../assets/image66.jpg') },
+// { id: 9, text: 'Item 9', imageSource: require('../assets/image77.jpg') },
+//   { id:10, text: 'Item 10', imageSource: require('../assets/image88.jpg') },
+//   { id:11, text: 'Item 11', imageSource: require('../assets/image99.jpg') },
+//   { id: 12, text: 'Item 12', imageSource: require('../assets/images 1010.jpg') },
+//   { id: 13, text: 'Item 13', imageSource: require('../assets/image1111.jpg') },
+//   { id: 14, text: 'Item 14', imageSource: require('../assets/tech3.jpg') },
+//   { id: 16, text: 'Item 16', imageSource: require('../assets/image44.jpg') },
+//   ];
+
+//   const offsetX = useSharedValue(0); // Assuming offsetX is being updated with the swipe position
+
+//   return (
+//     <ScrollView
+//       horizontal
+//       showsHorizontalScrollIndicator={false}
+//       onScroll={(event) => {
+//         offsetX.value = event.nativeEvent.contentOffset.x;
+//       }}
+//     >
+//       {data.map((item, index) => (
+//         <Card key={item.id} item={item} index={index} offsetX={offsetX} />
+//       ))}
+//     </ScrollView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   card: {
+//     margin: 10,
+//     borderRadius: 8,
+//     borderWidth: 2,
+//     borderColor: '#E8E8E8',
+//     justifyContent: 'center',
+//     backgroundColor: 'white',
+//   },
+//   cardImage: {
+//     width: Dimensions.get('window').width - 40,
+//     height: Dimensions.get('window').height - 200,
+//     borderRadius: 8,
+//     resizeMode: 'cover',
+//   },
+// });
+
+// export default YourComponent;
